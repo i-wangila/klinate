@@ -23,9 +23,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   ProviderProfile? _providerProfile;
   bool _isLoading = true;
   Map<String, dynamic>? _selectedPatient;
-  String _selectedPatientTab = 'History';
+  String _selectedPatientTab = 'Pt Info';
   final List<Map<String, dynamic>> _followUpPatients = [];
-  List<Map<String, dynamic>> _regularPatients = [];
+  final List<Map<String, dynamic>> _regularPatients = [];
   final List<String> _deletedPatientEmails = [];
   String _patientSearchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -575,132 +575,284 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       return name.contains(query) || emailLower.contains(query);
     }).toList();
 
-    return Container(
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Section
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Patients',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+    return Stack(
+      children: [
+        Container(
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Manage your patient records',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 20),
-                // Search Bar
-                TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      _patientSearchQuery = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search by name or email...',
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
-                    suffixIcon: _patientSearchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.clear, color: Colors.grey[600]),
-                            onPressed: () {
-                              setState(() {
-                                _searchController.clear();
-                                _patientSearchQuery = '';
-                              });
-                            },
-                          )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Patients',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Manage your patient records',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Patient List with Scrollbar
-          Expanded(
-            child: patients.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No patients found',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _patientSearchQuery.isEmpty
-                              ? 'No patients in your list'
-                              : 'Try a different search term',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Scrollbar(
-                    thumbVisibility: true,
-                    thickness: 6,
-                    radius: const Radius.circular(3),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: patients.length,
-                      itemBuilder: (context, index) {
-                        final patient = patients[index];
-                        return _buildPatientCard(
-                          name: patient['name'] as String,
-                          email: patient['email'] as String,
-                          date: patient['date'] as String,
-                          initial: patient['initial'] as String,
-                          color: patient['color'] as Color,
-                          isSelected: false,
-                        );
+                    const SizedBox(height: 20),
+                    // Search Bar
+                    TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _patientSearchQuery = value;
+                        });
                       },
+                      decoration: InputDecoration(
+                        hintText: 'Search by name or email...',
+                        hintStyle: TextStyle(color: Colors.grey[400]),
+                        prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                        suffixIcon: _patientSearchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: Colors.grey[600],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _searchController.clear();
+                                    _patientSearchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: Colors.black),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
                     ),
+                  ],
+                ),
+              ),
+              // Patient List with Scrollbar
+              Expanded(
+                child: patients.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No patients found',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _patientSearchQuery.isEmpty
+                                  ? 'No patients in your list'
+                                  : 'Try a different search term',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Scrollbar(
+                        thumbVisibility: true,
+                        thickness: 6,
+                        radius: const Radius.circular(3),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: patients.length,
+                          itemBuilder: (context, index) {
+                            final patient = patients[index];
+                            return _buildPatientCard(
+                              name: patient['name'] as String,
+                              email: patient['email'] as String,
+                              date: patient['date'] as String,
+                              initial: patient['initial'] as String,
+                              color: patient['color'] as Color,
+                              isSelected: false,
+                            );
+                          },
+                        ),
+                      ),
+              ),
+            ],
+          ),
+        ),
+        // Floating Action Button - Add Patient
+        Positioned(
+          right: 24,
+          bottom: 24,
+          child: FloatingActionButton(
+            onPressed: _showAddPatientDialog,
+            backgroundColor: Colors.white,
+            elevation: 4,
+            child: const Icon(Icons.person_add, color: Colors.black, size: 28),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showAddPatientDialog() {
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Add New Patient',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'Patient Name',
+                labelStyle: TextStyle(color: Colors.grey[600]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.black),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email Address',
+                labelStyle: TextStyle(color: Colors.grey[600]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.black),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final name = nameController.text.trim();
+              final email = emailController.text.trim();
+
+              if (name.isEmpty || email.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please fill in all fields'),
+                    backgroundColor: Colors.red,
                   ),
+                );
+                return;
+              }
+
+              // Check if patient already exists
+              if (_regularPatients.any((p) => p['email'] == email) ||
+                  _followUpPatients.any((p) => p['email'] == email)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Patient already exists'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+                return;
+              }
+
+              // Generate random color for avatar
+              final colors = [
+                Colors.blue,
+                Colors.green,
+                Colors.orange,
+                Colors.purple,
+                Colors.teal,
+                Colors.pink,
+              ];
+              final color = colors[_regularPatients.length % colors.length];
+
+              // Get initials
+              final nameParts = name.split(' ');
+              final initial = nameParts.length > 1
+                  ? '${nameParts[0][0]}${nameParts[1][0]}'.toUpperCase()
+                  : name[0].toUpperCase();
+
+              // Add patient
+              setState(() {
+                _regularPatients.add({
+                  'name': name,
+                  'email': email,
+                  'date': DateTime.now().toString().split(' ')[0],
+                  'initial': initial,
+                  'color': color,
+                });
+              });
+
+              // Save to persistent storage
+              _savePatientData();
+
+              Navigator.pop(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('$name added successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Add Patient'),
           ),
         ],
       ),
@@ -804,7 +956,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
               'initial': initial,
               'color': color,
             };
-            _selectedPatientTab = 'History';
+            _selectedPatientTab = 'Pt Info';
           });
         },
       ),
@@ -985,6 +1137,8 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Row(
                   children: [
+                    _buildTabButton('Pt Info'),
+                    const SizedBox(width: 8),
                     _buildTabButton('History'),
                     const SizedBox(width: 8),
                     _buildTabButton('Orders'),
@@ -1044,69 +1198,70 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     final patientEmail = _selectedPatient!['email'] as String;
     final records = _getPatientRecords(patientEmail, _selectedPatientTab);
 
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Add Record Button
-          Align(
-            alignment: Alignment.centerLeft,
-            child: ElevatedButton.icon(
-              onPressed: () => _showAddRecordDialog(patientEmail),
-              icon: const Icon(Icons.add, size: 18),
-              label: Text('Add $_selectedPatientTab'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+    return Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          child: records.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(_getTabIcon(), size: 64, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No ${_selectedPatientTab.toLowerCase()} records yet',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Click the button below to add a record',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 80),
+                  itemCount: records.length,
+                  itemBuilder: (context, index) {
+                    final record = records[index];
+                    return _buildRecordCard(record, index, patientEmail);
+                  },
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+        ),
+        // Floating Add Button - Pure White
+        Positioned(
+          right: 24,
+          bottom: 24,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _showAddRecordDialog(patientEmail),
+                borderRadius: BorderRadius.circular(28),
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.add, color: Colors.black, size: 28),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          // Records List
-          Expanded(
-            child: records.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(_getTabIcon(), size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No ${_selectedPatientTab.toLowerCase()} records yet',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Click the button above to add a record',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: records.length,
-                    itemBuilder: (context, index) {
-                      final record = records[index];
-                      return _buildRecordCard(record, index, patientEmail);
-                    },
-                  ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -2357,7 +2512,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
               'initial': initial,
               'color': color,
             };
-            _selectedPatientTab = 'History';
+            _selectedPatientTab = 'Pt Info';
             _selectedItem = 'Patients';
           });
         },
