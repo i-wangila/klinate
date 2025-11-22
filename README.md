@@ -67,15 +67,16 @@ flutterfire configure
 
 **For Android:**
 1. Download `google-services.json` from Firebase Console
-2. Place it in `android/app/` directory
+2. Copy `android/app/google-services.json.example` to `android/app/google-services.json`
+3. Replace the placeholder values with your actual Firebase configuration
 
 **For iOS:**
 1. Download `GoogleService-Info.plist` from Firebase Console
 2. Place it in `ios/Runner/` directory
 
 **For Web:**
-1. Configuration is handled via `lib/firebase_options.dart`
-2. Update the file with your Firebase web app credentials
+1. Copy `lib/firebase_options.dart.example` to `lib/firebase_options.dart`
+2. Replace the placeholder values with your actual Firebase web app credentials from Firebase Console
 
 #### Step 4: Enable Firebase Services
 
@@ -389,15 +390,34 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Healthcare providers for their valuable input
 - Open source community for excellent packages
 
-## ⚠️ Important Notes
+## ⚠️ Important Security Notes
 
-1. **Never commit `.env` file** - It contains sensitive API keys
-2. **Use separate Firebase projects** - Development, staging, and production
-3. **Enable Firebase security rules** - Protect your data
-4. **Monitor Firebase usage** - Stay within free tier limits or upgrade as needed
-5. **Backup your data** - Regular Firestore exports recommended
-6. **Keep dependencies updated** - Run `flutter pub upgrade` regularly
-7. **Test on multiple platforms** - Ensure compatibility across Android, iOS, and Web
+1. **Never commit sensitive files to Git:**
+   - `.env` - Contains Firebase API keys
+   - `android/app/google-services.json` - Android Firebase config
+   - `ios/Runner/GoogleService-Info.plist` - iOS Firebase config
+   - `lib/firebase_options.dart` - Flutter Firebase config
+   
+2. **These files are in .gitignore** - They won't be committed to version control
+
+3. **Use the .example files** - Copy them and add your real credentials:
+   ```bash
+   cp android/app/google-services.json.example android/app/google-services.json
+   cp lib/firebase_options.dart.example lib/firebase_options.dart
+   # Then edit these files with your actual Firebase credentials
+   ```
+
+4. **Use separate Firebase projects** - Development, staging, and production
+
+5. **Enable Firebase security rules** - Protect your data
+
+6. **Monitor Firebase usage** - Stay within free tier limits or upgrade as needed
+
+7. **Backup your data** - Regular Firestore exports recommended
+
+8. **Keep dependencies updated** - Run `flutter pub upgrade` regularly
+
+9. **Test on multiple platforms** - Ensure compatibility across Android, iOS, and Web
 
 ## 🔄 Version History
 
