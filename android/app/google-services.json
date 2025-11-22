@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "838533178040",
+    "project_id": "klinate-506c9",
+    "storage_bucket": "klinate-506c9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838533178040:android:44547794d641f48a694a4d",
+        "android_client_info": {
+          "package_name": "www.klinate.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjVxRd3hzm3FrdLGLZjVTlu6jfKCNtXyo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

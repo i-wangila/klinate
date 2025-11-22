@@ -161,7 +161,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     }
 
     final currentUser = UserService.currentUser;
-    final isAdmin = currentUser?.currentRole == UserRole.admin;
+    final isAdmin = currentUser?.hasRole(UserRole.admin) ?? false;
 
     // Admins can access Business Dashboard without provider profile
     // Check if provider profile exists and is approved (skip for admins)
