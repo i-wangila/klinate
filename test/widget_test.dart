@@ -7,7 +7,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:tmed_app/main.dart';
+import 'package:klinate/main.dart';
 
 void main() {
   testWidgets('Klinate app loads successfully', (WidgetTester tester) async {

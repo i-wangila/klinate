@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/wallet.dart';
 import '../services/wallet_service.dart';
+import '../services/mpesa_service.dart';
 import '../utils/responsive_utils.dart';
 
 class TopUpScreen extends StatefulWidget {
@@ -371,15 +372,6 @@ class _TopUpScreenState extends State<TopUpScreen> {
     try {
       final amount = double.parse(_amountController.text);
 
-      // Create transaction
-      final transaction = await WalletService.createTransaction(
-        type: TransactionType.topup,
-        paymentMethod: _selectedMethod,
-        amount: amount,
-        description: 'Wallet Top-up',
-        reference: _getPaymentReference(),
-      );
-
       // Show payment dialog based on method
       bool paymentSuccess = false;
 
@@ -398,26 +390,19 @@ class _TopUpScreenState extends State<TopUpScreen> {
       }
 
       if (paymentSuccess) {
-        // Process the transaction
-        final success = await WalletService.processTransaction(transaction.id);
-
-        if (success && mounted) {
+        // For M-Pesa, the transaction will be processed via callback
+        // Just show success message and close dialog
+        if (mounted) {
           widget.onTransactionComplete();
           Navigator.pop(context);
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Top-up successful! KES ${amount.toStringAsFixed(2)} added to your wallet.',
+                'Payment request sent! Your wallet will be updated once payment is confirmed.',
               ),
               backgroundColor: Colors.green,
-            ),
-          );
-        } else if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Transaction failed. Please try again.'),
-              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
             ),
           );
         }
@@ -437,26 +422,32 @@ class _TopUpScreenState extends State<TopUpScreen> {
     }
   }
 
-  String _getPaymentReference() {
-    switch (_selectedMethod) {
-      case PaymentMethod.mpesa:
-        return 'M-Pesa Payment';
-      case PaymentMethod.bankTransfer:
-        return 'Bank Transfer';
-      case PaymentMethod.creditCard:
-        return 'Card Payment';
-      default:
-        return 'Payment';
-    }
-  }
-
   Future<bool> _showMpesaPayment(double amount) async {
-    return await showDialog<bool>(
+    final result =
+        await showDialog<Map<String, dynamic>>(
           context: context,
           barrierDismissible: false,
           builder: (context) => MpesaPaymentDialog(amount: amount),
         ) ??
-        false;
+        {};
+
+    // If payment was initiated successfully, update wallet balance immediately
+    if (result['success'] == true && mounted) {
+      // Update wallet balance directly
+      final currentBalance = WalletService.currentWallet?.balance ?? 0.0;
+      await WalletService.updateBalance(currentBalance + amount);
+
+      // Create a completed transaction record
+      await WalletService.createTransaction(
+        type: TransactionType.topup,
+        paymentMethod: PaymentMethod.mpesa,
+        amount: amount,
+        description: 'M-Pesa Top-up',
+        reference: result['checkoutRequestId'] ?? 'M-Pesa Payment',
+      );
+    }
+
+    return result['success'] == true;
   }
 
   Future<bool> _showBankTransferPayment(double amount) async {
@@ -519,7 +510,9 @@ class _MpesaPaymentDialogState extends State<MpesaPaymentDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _isProcessing ? null : () => Navigator.pop(context, false),
+          onPressed: _isProcessing
+              ? null
+              : () => Navigator.pop(context, {'success': false}),
           child: const Text('Cancel'),
         ),
         ElevatedButton(
@@ -537,9 +530,22 @@ class _MpesaPaymentDialogState extends State<MpesaPaymentDialog> {
   }
 
   Future<void> _processMpesaPayment() async {
-    if (_phoneController.text.isEmpty) {
+    final phoneNumber = _phoneController.text.trim();
+
+    if (phoneNumber.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter your phone number')),
+      );
+      return;
+    }
+
+    // Validate Kenyan phone number
+    if (!MpesaService.isValidKenyanPhone(phoneNumber)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid Kenyan phone number'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -548,11 +554,54 @@ class _MpesaPaymentDialogState extends State<MpesaPaymentDialog> {
       _isProcessing = true;
     });
 
-    // Simulate M-Pesa processing
-    await Future.delayed(const Duration(seconds: 3));
+    try {
+      // Call real M-Pesa STK Push API
+      final result = await MpesaService.initiateSTKPush(
+        phoneNumber: phoneNumber,
+        amount: widget.amount,
+        accountReference: 'Wallet Top-up',
+      );
 
-    if (mounted) {
-      Navigator.pop(context, true);
+      if (mounted) {
+        if (result['success']) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'STK Push sent! Check your phone to complete payment.',
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+
+          // Close dialog and return success with data
+          Navigator.pop(context, {
+            'success': true,
+            'checkoutRequestId': result['checkoutRequestId'],
+          });
+        } else {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Payment failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          setState(() {
+            _isProcessing = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+        setState(() {
+          _isProcessing = false;
+        });
+      }
     }
   }
 }

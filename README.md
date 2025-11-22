@@ -318,6 +318,91 @@ ios/
 .env.example                     # Template for environment variables
 ```
 
+## 💳 M-Pesa Integration
+
+### Overview
+The app integrates with Safaricom's M-Pesa Daraja API for real money transactions:
+- **Top Up**: Users can add money to their wallet via M-Pesa STK Push
+- **Withdraw**: Users can withdraw money from wallet to their M-Pesa account
+
+### ⚠️ IMPORTANT SECURITY NOTE
+
+**M-Pesa integration requires a backend server!** Never put M-Pesa credentials directly in your mobile app.
+
+**Recommended Architecture:**
+```
+Flutter App → Backend Server → M-Pesa Daraja API
+              (Firebase Functions,
+               Node.js, PHP, etc.)
+```
+
+### Setup M-Pesa Integration
+
+1. **Get Daraja API Credentials:**
+   - Visit https://developer.safaricom.co.ke/
+   - Create an account and login
+   - Go to "My Apps" and create a new app
+   - Select "Lipa Na M-Pesa Online" API
+   - Get your Consumer Key, Consumer Secret, Business Short Code, and Passkey
+
+2. **Set up Firebase Cloud Functions (Backend):**
+   ```bash
+   cd functions
+   npm install
+   ```
+
+3. **Configure M-Pesa credentials in Firebase:**
+   ```bash
+   firebase functions:config:set \
+     mpesa.consumer_key="YOUR_CONSUMER_KEY" \
+     mpesa.consumer_secret="YOUR_CONSUMER_SECRET" \
+     mpesa.business_short_code="YOUR_SHORTCODE" \
+     mpesa.passkey="YOUR_PASSKEY" \
+     mpesa.environment="sandbox" \
+     app.url="https://YOUR_REGION-YOUR_PROJECT_ID.cloudfunctions.net"
+   ```
+
+4. **Deploy Firebase Functions:**
+   ```bash
+   firebase deploy --only functions
+   ```
+
+5. **Update .env file (for reference only):**
+   ```env
+   MPESA_CONSUMER_KEY=your_consumer_key
+   MPESA_CONSUMER_SECRET=your_consumer_secret
+   MPESA_BUSINESS_SHORT_CODE=your_shortcode
+   MPESA_PASSKEY=your_passkey
+   MPESA_CALLBACK_URL=https://your-functions-url/mpesaCallback
+   MPESA_ENVIRONMENT=sandbox  # or 'production'
+   ```
+
+6. **Test in Sandbox:**
+   - Use M-Pesa sandbox for testing
+   - Test phone number: 254708374149
+   - Test amounts: 1-70000
+   - Enter PIN: 1234 (sandbox test PIN)
+
+### M-Pesa Service Features
+
+- **STK Push**: Prompts user to enter M-Pesa PIN on their phone
+- **Transaction Query**: Check status of pending transactions
+- **B2C Payments**: Send money from business to customer (withdrawals)
+- **Phone Number Validation**: Validates Kenyan phone numbers
+- **Auto-formatting**: Formats phone numbers correctly
+
+### Production Checklist
+
+Before going live with M-Pesa:
+- [ ] Set up production Daraja API credentials
+- [ ] Deploy secure backend server
+- [ ] Implement proper callback handling
+- [ ] Set up transaction logging
+- [ ] Implement retry logic for failed transactions
+- [ ] Add transaction reconciliation
+- [ ] Test thoroughly in sandbox environment
+- [ ] Get M-Pesa Go-Live approval from Safaricom
+
 ## 🔧 Firebase Collections Structure
 
 ```

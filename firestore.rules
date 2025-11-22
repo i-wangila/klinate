@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+    }
+    
+    // M-Pesa transactions - users can only read their own
+    match /mpesa_transactions/{transactionId} {
+      allow read: if request.auth != null && 
+                     resource.data.userId == request.auth.uid;
+      allow write: if false; // Only Cloud Functions can write
+    }
+    
+    // Providers collection
+    match /providers/{providerId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Appointments collection
+    match /appointments/{appointmentId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Messages collection
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Admin collection (restricted)
+    match /admins/{adminId} {
+      allow read: if request.auth != null && 
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if request.auth != null && 
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

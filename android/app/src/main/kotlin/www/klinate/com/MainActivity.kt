@@ -1,4 +1,4 @@
-package com.example.tmed_app
+package www.klinate.com
 
 import io.flutter.embedding.android.FlutterActivity
 

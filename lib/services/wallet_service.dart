@@ -33,11 +33,11 @@ class WalletService {
     if (walletData != null) {
       _currentWallet = Wallet.fromJson(jsonDecode(walletData));
     } else {
-      // Create default wallet
+      // Create default wallet with 0 balance
       _currentWallet = Wallet(
         id: 'wallet_${DateTime.now().millisecondsSinceEpoch}',
         userId: 'current_user', // Replace with actual user ID
-        balance: 2500.0, // Default balance
+        balance: 0.0, // Start with 0 balance
         lastUpdated: DateTime.now(),
       );
       await _saveWallet();
@@ -75,45 +75,8 @@ class WalletService {
           .map((json) => WalletTransaction.fromJson(json))
           .toList();
     } else {
-      // Add some sample transactions
-      _transactions = [
-        WalletTransaction(
-          id: 'txn_1',
-          userId: 'current_user',
-          type: TransactionType.payment,
-          paymentMethod: PaymentMethod.wallet,
-          amount: 1500.0,
-          description: 'Consultation Payment',
-          reference: 'Dr. Smith - Video Call',
-          status: TransactionStatus.completed,
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          completedAt: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        WalletTransaction(
-          id: 'txn_2',
-          userId: 'current_user',
-          type: TransactionType.topup,
-          paymentMethod: PaymentMethod.mpesa,
-          amount: 5000.0,
-          description: 'Wallet Top-up',
-          reference: 'M-Pesa Payment',
-          status: TransactionStatus.completed,
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-          completedAt: DateTime.now().subtract(const Duration(days: 3)),
-        ),
-        WalletTransaction(
-          id: 'txn_3',
-          userId: 'current_user',
-          type: TransactionType.payment,
-          paymentMethod: PaymentMethod.wallet,
-          amount: 850.0,
-          description: 'Prescription Payment',
-          reference: 'Goodlife Pharmacy',
-          status: TransactionStatus.completed,
-          createdAt: DateTime.now().subtract(const Duration(days: 5)),
-          completedAt: DateTime.now().subtract(const Duration(days: 5)),
-        ),
-      ];
+      // Start with no transactions
+      _transactions = [];
       await _saveTransactions();
     }
   }

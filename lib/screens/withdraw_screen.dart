@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/wallet.dart';
 import '../services/wallet_service.dart';
+import '../services/mpesa_service.dart';
 import '../utils/responsive_utils.dart';
 
 class WithdrawScreen extends StatefulWidget {
@@ -401,9 +402,22 @@ class _MpesaWithdrawalDialogState extends State<_MpesaWithdrawalDialog> {
   }
 
   Future<void> _processMpesaWithdrawal() async {
-    if (_phoneController.text.isEmpty) {
+    final phoneNumber = _phoneController.text.trim();
+
+    if (phoneNumber.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter your phone number')),
+      );
+      return;
+    }
+
+    // Validate Kenyan phone number
+    if (!MpesaService.isValidKenyanPhone(phoneNumber)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid Kenyan phone number'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -411,33 +425,41 @@ class _MpesaWithdrawalDialogState extends State<_MpesaWithdrawalDialog> {
     setState(() => _isProcessing = true);
 
     try {
-      final transaction = await WalletService.createTransaction(
-        type: TransactionType.withdrawal,
-        paymentMethod: PaymentMethod.mpesa,
+      // Call real M-Pesa B2C API for withdrawal
+      final result = await MpesaService.initiateWithdrawal(
+        phoneNumber: phoneNumber,
         amount: widget.amount,
-        description: 'M-Pesa Withdrawal',
-        reference: 'M-Pesa: ${_phoneController.text}',
       );
 
-      final success = await WalletService.processTransaction(transaction.id);
-
-      if (success && mounted) {
-        Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Withdrawal successful! KES ${widget.amount.toStringAsFixed(2)} will be sent to ${_phoneController.text}.',
-            ),
-            backgroundColor: Colors.green,
-          ),
+      if (result['success']) {
+        // Create transaction record
+        await WalletService.createTransaction(
+          type: TransactionType.withdrawal,
+          paymentMethod: PaymentMethod.mpesa,
+          amount: widget.amount,
+          description: 'M-Pesa Withdrawal',
+          reference: result['conversationId'] ?? 'M-Pesa: $phoneNumber',
         );
+
+        if (mounted) {
+          Navigator.pop(context, true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Withdrawal initiated! KES ${widget.amount.toStringAsFixed(2)} will be sent to $phoneNumber.',
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Withdrawal failed. Please try again.'),
+          SnackBar(
+            content: Text(result['message'] ?? 'Withdrawal failed'),
             backgroundColor: Colors.red,
           ),
         );
+        setState(() => _isProcessing = false);
       }
     } catch (e) {
       if (mounted) {

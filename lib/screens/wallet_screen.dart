@@ -5,7 +5,6 @@ import '../services/wallet_service.dart';
 import '../utils/responsive_utils.dart';
 import 'topup_screen.dart';
 import 'withdraw_screen.dart';
-import 'bill_payment_screen.dart';
 import 'manage_cards_screen.dart';
 import 'manage_accounts_screen.dart';
 import 'transaction_history_screen.dart';
@@ -228,7 +227,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           'Pay Bills',
                           Icons.receipt,
                           Colors.grey[700]!,
-                          () => _showBillPaymentDialog(),
+                          () => _showPayBillsInfo(),
                         ),
                       ),
                     ],
@@ -264,7 +263,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       'Pay Bills',
                       Icons.receipt,
                       Colors.grey[700]!,
-                      () => _showBillPaymentDialog(),
+                      () => _showPayBillsInfo(),
                     ),
                   ),
                 ],
@@ -589,15 +588,20 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  void _showBillPaymentDialog() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BillPaymentScreen(
-          onTransactionComplete: () {
-            _refreshWallet();
-          },
+  void _showPayBillsInfo() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pay Bills'),
+        content: const Text(
+          'Pay bills feature is coming soon. For now, you can pay healthcare providers directly through their profiles.',
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
