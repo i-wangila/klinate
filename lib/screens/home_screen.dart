@@ -50,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     MessageService.addListener(_onMessageUpdate);
     _searchController.addListener(_onSearchChanged);
     _loadProfileImage();
+    _reloadData(); // Ensure providers are loaded when screen initializes
   }
 
   @override
@@ -113,8 +114,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       if (mounted) {
-        setState(() {});
+        // Reload providers from storage when app resumes
+        _reloadData();
       }
+    }
+  }
+
+  Future<void> _reloadData() async {
+    await ProviderService.initialize();
+    await UserService.initialize();
+    await ReviewService.initialize();
+    if (mounted) {
+      setState(() {});
     }
   }
 

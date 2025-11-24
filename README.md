@@ -205,49 +205,80 @@ The `.env` file contains sensitive API keys and should be kept private. This fil
 
 ### 🔐 Authentication & Security
 - Firebase Authentication integration
-- Email/Password authentication
+- Email/Password authentication with strong password requirements
+- User titles (Mr., Mrs., Dr., Prof., etc.)
 - Secure session management
+- Role-based access control
 
 ### 👩‍⚕️ Healthcare Provider Network
 - Individual doctors and specialists
 - Healthcare facilities and hospitals
 - Pharmacies and laboratories
-- Business account registration
-- Profile management with Firebase Storage
+- Business account registration with document verification
+- Professional profile management with Firebase Storage
+- Location-based provider listings (city & country)
 - Patient management system
+- Dynamic ratings and reviews system
 
 ### 📞 Communication System
 - Real-time chat with Firestore
-- Voice and video calling
-- Unified inbox
+- WebRTC voice and video calling (WhatsApp-style)
+- Unified inbox with message categories
 - Message notifications
 - System notifications
+- Direct phone dialing from provider profiles
 
 ### 📅 Appointment Management
 - Smart booking system
-- Multiple consultation types
+- Multiple consultation types (In-person, Video, Phone)
 - Real-time availability checking
-- Appointment history
+- Appointment rescheduling
+- Appointment history with clear function
+- Reminder notifications
 - Analytics dashboard
 
 ### 💳 Payment & Wallet System
 - Digital wallet management
+- M-Pesa integration (Top-up & Withdraw)
+- C2B payment for direct provider payments
 - Transaction history
-- Payment integration ready
+- Pay medical bills feature
+- Transfer between users
+- Payment method selection
 
 ### 🛡️ Admin System
-- Admin dashboard
-- Business account approval
-- User management
-- Activity logging
+- Comprehensive admin dashboard
+- Business account approval workflow
+- Document verification system
+- User management with role assignment
+- Provider and patient analytics
+- Activity logging and audit trails
+- Review management and moderation
 - Reports and analytics
 
 ### 📊 Business Dashboard
-- Patient management
-- Follow-up system
-- Analytics with interactive charts
-- Review management
-- Appointment tracking
+- Patient management with detailed records
+- Follow-up system with reminders
+- Interactive analytics with fl_chart
+- Review and rating management
+- Appointment tracking and statistics
+- Revenue analytics
+- Patient satisfaction metrics
+
+### 📄 Document Management
+- Upload medical records and certificates
+- Document verification for providers
+- Download functionality for all documents
+- Document status tracking (Pending, Approved, Rejected)
+- Secure document storage
+
+### ⭐ Reviews & Ratings
+- Patient review system
+- Provider rating calculation
+- Review moderation by admins
+- Persistent storage with SharedPreferences
+- Prevention of self-reviews
+- Real-time rating updates
 
 ## 🛠 Technical Stack
 
@@ -506,7 +537,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔄 Version History
 
-### Current Version
+### Version 2.0 (Current)
+- ✨ User titles support (Mr., Mrs., Dr., Prof., etc.)
+- 🌍 Location-based provider profiles (city & country)
+- 📞 WebRTC video and voice calling
+- ⭐ Dynamic reviews and ratings system
+- 📱 Direct phone dialing from profiles
+- 💳 M-Pesa C2B payment integration
+- 📄 Document upload and download functionality
+- 🎨 Standardized button styling across app
+- 🔄 Provider persistence fix (no more disappearing profiles)
+- 🛡️ Enhanced admin review management
+- 📊 Improved analytics and reporting
+
+### Version 1.0
 - Firebase integration with Authentication and Firestore
 - Business dashboard with patient management
 - Real-time messaging and notifications

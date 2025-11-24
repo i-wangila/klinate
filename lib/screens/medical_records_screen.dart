@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/document.dart';
 import '../services/document_service.dart';
+import '../services/user_service.dart';
 
 class MedicalRecordsScreen extends StatefulWidget {
   final String? highlightDocumentId;
@@ -39,6 +42,22 @@ class _MedicalRecordsScreenState extends State<MedicalRecordsScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.upload_file, color: Colors.black),
+            onPressed: _uploadDocument,
+            tooltip: 'Upload Document',
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _uploadDocument,
+        backgroundColor: Colors.blue,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          'Upload',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
       body: Column(
@@ -277,7 +296,17 @@ class _MedicalRecordsScreenState extends State<MedicalRecordsScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Icon(Icons.download, size: 20, color: Colors.grey[600]),
+                    IconButton(
+                      icon: Icon(
+                        Icons.download,
+                        size: 20,
+                        color: Colors.blue[700],
+                      ),
+                      onPressed: () => _downloadDocument(document),
+                      tooltip: 'Download',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
                   ],
                 ),
               ],
@@ -456,6 +485,203 @@ class _MedicalRecordsScreenState extends State<MedicalRecordsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _uploadDocument() async {
+    try {
+      // Pick a file
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+      );
+
+      if (result != null) {
+        final file = result.files.first;
+
+        // Show document type selection dialog
+        final documentType = await _showDocumentTypeDialog();
+        if (documentType == null) return;
+
+        // Show notes dialog
+        final notes = await _showNotesDialog();
+
+        final currentUser = UserService.currentUser;
+        if (currentUser == null) {
+          _showSnackBar('Please sign in to upload documents', Colors.red);
+          return;
+        }
+
+        // Upload document using DocumentService
+        final success = await DocumentService.uploadDocument(
+          name: file.name,
+          type: documentType,
+          filePath: file.path ?? '',
+          notes: notes,
+        );
+
+        if (success && mounted) {
+          setState(() {});
+          _showSnackBar('Document uploaded successfully', Colors.green);
+        } else if (mounted) {
+          _showSnackBar('Failed to upload document', Colors.red);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Error uploading document: $e', Colors.red);
+      }
+    }
+  }
+
+  Future<DocumentType?> _showDocumentTypeDialog() async {
+    final medicalDocTypes = [
+      DocumentType.prescription,
+      DocumentType.labResults,
+      DocumentType.xrayReport,
+      DocumentType.medicalReport,
+      DocumentType.dischargeSummary,
+      DocumentType.vaccinationRecord,
+      DocumentType.ctScanReport,
+      DocumentType.mriReport,
+      DocumentType.ultrasoundReport,
+      DocumentType.ecgReport,
+      DocumentType.nutritionPlan,
+      DocumentType.physiotherapyReport,
+      DocumentType.dentalReport,
+      DocumentType.eyeExamReport,
+      DocumentType.bloodTestReport,
+      DocumentType.urineTestReport,
+      DocumentType.biopsyReport,
+      DocumentType.pathologyReport,
+    ];
+
+    return await showDialog<DocumentType>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Document Type'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: medicalDocTypes.map((type) {
+              return ListTile(
+                title: Text(_getDocumentTypeName(type)),
+                onTap: () => Navigator.pop(context, type),
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getDocumentTypeName(DocumentType type) {
+    switch (type) {
+      case DocumentType.prescription:
+        return 'Prescription';
+      case DocumentType.labResults:
+        return 'Lab Results';
+      case DocumentType.xrayReport:
+        return 'X-Ray Report';
+      case DocumentType.medicalReport:
+        return 'Medical Report';
+      case DocumentType.dischargeSummary:
+        return 'Discharge Summary';
+      case DocumentType.vaccinationRecord:
+        return 'Vaccination Record';
+      case DocumentType.ctScanReport:
+        return 'CT Scan Report';
+      case DocumentType.mriReport:
+        return 'MRI Report';
+      case DocumentType.ultrasoundReport:
+        return 'Ultrasound Report';
+      case DocumentType.ecgReport:
+        return 'ECG Report';
+      case DocumentType.nutritionPlan:
+        return 'Nutrition Plan';
+      case DocumentType.physiotherapyReport:
+        return 'Physiotherapy Report';
+      case DocumentType.dentalReport:
+        return 'Dental Report';
+      case DocumentType.eyeExamReport:
+        return 'Eye Exam Report';
+      case DocumentType.bloodTestReport:
+        return 'Blood Test Report';
+      case DocumentType.urineTestReport:
+        return 'Urine Test Report';
+      case DocumentType.biopsyReport:
+        return 'Biopsy Report';
+      case DocumentType.pathologyReport:
+        return 'Pathology Report';
+      default:
+        return 'Other';
+    }
+  }
+
+  Future<String?> _showNotesDialog() async {
+    final controller = TextEditingController();
+
+    return await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Notes (Optional)'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Enter any additional notes...',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, ''),
+            child: const Text('Skip'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _downloadDocument(Document document) async {
+    try {
+      final uri = Uri.parse(document.filePath);
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+        if (mounted) {
+          _showSnackBar('Opening ${document.name}...', Colors.blue);
+        }
+      } else {
+        if (mounted) {
+          _showSnackBar('Cannot open ${document.name}', Colors.red);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Error opening document: $e', Colors.red);
+      }
+    }
+  }
+
+  void _showSnackBar(String message, Color backgroundColor) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

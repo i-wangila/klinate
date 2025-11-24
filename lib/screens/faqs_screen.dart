@@ -100,7 +100,61 @@ class FAQsScreen extends StatelessWidget {
             context,
             question: 'Can I rate and review healthcare providers?',
             answer:
-                'Yes! After your appointment, you can rate your experience and leave a review. This helps other users make informed decisions.',
+                'Yes! After your appointment, you can rate your experience and leave a review. This helps other users make informed decisions. You cannot review yourself if you\'re also a provider.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'How do I make video or voice calls with my doctor?',
+            answer:
+                'Open your chat with the doctor from the Inbox tab. Tap the video camera icon for a video call or the phone icon for a voice call. Make sure you have a stable internet connection for the best experience.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'Can I call my doctor directly on their phone?',
+            answer:
+                'Yes! When viewing a provider\'s profile, you\'ll see their contact information including phone number. Tap the phone number to call them directly using your phone\'s dialer.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'How do I add my professional title (Dr., Prof., etc.)?',
+            answer:
+                'When signing up, select your title from the dropdown menu. You can also update it later by going to Profile > Edit Profile and selecting your preferred title (Mr., Mrs., Ms., Dr., Prof., Rev., Hon.).',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'How do I upload documents or medical records?',
+            answer:
+                'Go to Profile > My Documents or Medical Records. Tap the "Upload" button, select the document type, choose the file from your device, and add a description. Your document will be securely stored.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'How do I download my medical records?',
+            answer:
+                'Navigate to Profile > Medical Records. Find the document you want to download and tap the download icon. The document will be opened in your device\'s default viewer where you can save it.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'How do I pay a provider directly using M-Pesa?',
+            answer:
+                'When viewing a provider\'s profile, tap "Pay Provider". Enter the amount and your M-Pesa confirmation code (from the M-Pesa message you received after sending money). The payment will be verified and recorded.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'How do I withdraw money from my wallet?',
+            answer:
+                'Go to Profile > Wallet > Withdraw. Enter the amount you want to withdraw and your M-Pesa phone number. You\'ll receive the money directly to your M-Pesa account within minutes.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'Why can\'t I see some healthcare providers?',
+            answer:
+                'Only approved healthcare providers appear in the app. Providers must submit their credentials and be verified by our admin team before they can offer services. This ensures quality and safety.',
+          ),
+          _buildFAQItem(
+            context,
+            question: 'How do I clear my appointment history?',
+            answer:
+                'Go to the Appointments tab, tap the three-dot menu at the top right, and select "Clear History". Confirm the action to remove all past appointments. This action cannot be undone.',
           ),
           _buildFAQItem(
             context,
