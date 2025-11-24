@@ -423,14 +423,17 @@ class _RescheduleAppointmentScreenState
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.grey),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.grey,
+                    side: const BorderSide(color: Colors.grey, width: 1),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(25),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 0,
                   ),
                   child: const Text(
                     'Back',
@@ -449,9 +452,10 @@ class _RescheduleAppointmentScreenState
                     foregroundColor: Colors.black,
                     side: const BorderSide(color: Colors.black, width: 1),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(25),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 0,
                   ),
                   child: _isLoading
                       ? const SizedBox(

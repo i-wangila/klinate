@@ -29,9 +29,6 @@ class ProviderService {
         providersMap.forEach((key, value) {
           _providers[key] = ProviderProfile.fromJson(value);
         });
-      } else {
-        // Add sample provider for testing if no providers exist
-        _initializeSampleProvider();
       }
 
       if (kDebugMode) {
@@ -279,7 +276,7 @@ class ProviderService {
       orElse: () => throw Exception('User not found'),
     );
 
-    return user.name;
+    return user.fullName; // Use fullName which includes title
   }
 
   // Get provider email (from linked user)
@@ -317,40 +314,6 @@ class ProviderService {
 
     if (kDebugMode) {
       print('All providers cleared');
-    }
-  }
-
-  // Initialize sample provider for testing
-  static void _initializeSampleProvider() {
-    final sampleProvider = ProviderProfile(
-      id: 'provider_sample_001',
-      userId: 'user_sample_001',
-      providerType: UserRole.doctor,
-      specialization: 'General Practitioner',
-      experienceYears: 10,
-      consultationFee: 1500.0,
-      rating: 4.8,
-      totalReviews: 125,
-      bio:
-          'Experienced general practitioner with over 10 years of medical practice. Specializing in primary care, preventive medicine, and chronic disease management.',
-      servicesOffered: [
-        'General Consultation',
-        'Health Checkups',
-        'Chronic Disease Management',
-        'Preventive Care',
-        'Medical Prescriptions',
-      ],
-      status: ProviderStatus.approved,
-      verifiedAt: DateTime.now(),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-
-    _providers[sampleProvider.id] = sampleProvider;
-    _saveProviders();
-
-    if (kDebugMode) {
-      print('Sample provider initialized: ${sampleProvider.id}');
     }
   }
 }

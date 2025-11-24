@@ -57,6 +57,39 @@ class Review {
       providerName: providerName ?? this.providerName,
     );
   }
+
+  // JSON serialization
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'providerId': providerId,
+      'patientId': patientId,
+      'patientName': patientName,
+      'rating': rating,
+      'comment': comment,
+      'createdAt': createdAt.toIso8601String(),
+      'appointmentId': appointmentId,
+      'providerType': providerType.toString().split('.').last,
+      'providerName': providerName,
+    };
+  }
+
+  factory Review.fromJson(Map<String, dynamic> json) {
+    return Review(
+      id: json['id'] as String,
+      providerId: json['providerId'] as String,
+      patientId: json['patientId'] as String,
+      patientName: json['patientName'] as String,
+      rating: json['rating'] as int,
+      comment: json['comment'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      appointmentId: json['appointmentId'] as String,
+      providerType: ProviderType.values.firstWhere(
+        (e) => e.toString().split('.').last == json['providerType'],
+      ),
+      providerName: json['providerName'] as String,
+    );
+  }
 }
 
 class ProviderRating {

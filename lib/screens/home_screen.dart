@@ -11,6 +11,7 @@ import '../services/user_service.dart';
 import 'provider_profile_screen.dart';
 import '../services/provider_service.dart';
 import '../services/message_service.dart';
+import '../services/review_service.dart';
 import '../models/provider_profile.dart';
 import '../models/user_profile.dart';
 import 'wallet_screen.dart';
@@ -87,11 +88,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
       if (providerName.toLowerCase().contains(lowerQuery) ||
           specialization.toLowerCase().contains(lowerQuery)) {
+        // Get dynamic rating from reviews
+        final providerRating = ReviewService.getProviderRating(provider.id);
         results.add({
           'type': 'provider',
           'name': providerName,
           'subtitle': specialization,
-          'rating': provider.rating.toStringAsFixed(2),
+          'rating': providerRating.averageRating.toStringAsFixed(2),
           'data': provider,
         });
       }
@@ -352,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         child: TextField(
           controller: _searchController,
           decoration: InputDecoration(
-            hintText: 'Search doctors, hospitals, clinics, pharmacies...',
+            hintText: 'Search doctors and specialists...',
             hintStyle: TextStyle(
               color: Colors.grey[500],
               fontSize: ResponsiveUtils.getResponsiveFontSize(context, 14),
@@ -1001,17 +1004,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     // Filter providers by specialization
     final generalPractitioners = allProviders
-        .where(
-          (p) =>
-              p.specialization?.toLowerCase() == 'general' ||
-              p.specialization?.toLowerCase() == 'general practitioner',
-        )
+        .where((p) => p.specialization?.toLowerCase() == 'general practitioner')
         .toList();
 
     final specialists = allProviders
         .where(
           (p) =>
-              p.specialization?.toLowerCase() != 'general' &&
               p.specialization?.toLowerCase() != 'general practitioner' &&
               p.specialization != null &&
               p.specialization!.isNotEmpty,
@@ -1091,17 +1089,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 GestureDetector(
                   onTap: () => _navigateToCategory(
                     'General Practitioners',
-                    generalPractitioners
-                        .map(
-                          (p) => {
-                            'id': p.id,
-                            'title':
-                                '${ProviderService.getProviderDisplayName(p.id)} - ${p.specialization}',
-                            'rating': p.rating.toStringAsFixed(1),
-                            'location': '',
-                          },
-                        )
-                        .toList(),
+                    generalPractitioners.map((p) {
+                      final rating = ReviewService.getProviderRating(p.id);
+                      return {
+                        'id': p.id,
+                        'title':
+                            '${ProviderService.getProviderDisplayName(p.id)} - ${p.specialization}',
+                        'rating': rating.averageRating.toStringAsFixed(1),
+                        'location': '',
+                      };
+                    }).toList(),
                   ),
                   child: Container(
                     padding: EdgeInsets.all(
@@ -1180,17 +1177,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               GestureDetector(
                 onTap: () => _navigateToCategory(
                   'Specialists',
-                  allProviders
-                      .map(
-                        (p) => {
-                          'id': p.id,
-                          'title':
-                              '${ProviderService.getProviderDisplayName(p.id)} - ${p.specialization}',
-                          'rating': p.rating.toStringAsFixed(1),
-                          'location': '',
-                        },
-                      )
-                      .toList(),
+                  allProviders.map((p) {
+                    final rating = ReviewService.getProviderRating(p.id);
+                    return {
+                      'id': p.id,
+                      'title':
+                          '${ProviderService.getProviderDisplayName(p.id)} - ${p.specialization}',
+                      'rating': rating.averageRating.toStringAsFixed(1),
+                      'location': '',
+                    };
+                  }).toList(),
                 ),
                 child: Container(
                   padding: EdgeInsets.all(
@@ -1287,7 +1283,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ),
                 Flexible(
                   child: Text(
-                    provider.rating.toStringAsFixed(1),
+                    ReviewService.getProviderRating(
+                      provider.id,
+                    ).averageRating.toStringAsFixed(1),
                     style: TextStyle(
                       fontSize: ResponsiveUtils.getResponsiveFontSize(
                         context,

@@ -416,8 +416,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.orange,
+              side: const BorderSide(color: Colors.orange, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Suspend'),
           ),
@@ -475,8 +480,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Delete'),
           ),

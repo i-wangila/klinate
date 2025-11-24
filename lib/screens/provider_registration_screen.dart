@@ -63,7 +63,7 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
   // Step 4: Education (Academic Qualifications)
   String _selectedTitle = 'Dr.';
   String _selectedEducationLevel = 'Bachelor\'s Degree';
-  String _selectedSpecialization = 'General';
+  String _selectedSpecialization = 'General Practitioner';
   final _institutionController = TextEditingController();
   final _yearCompletedController = TextEditingController();
   final _fieldOfStudyController = TextEditingController();
@@ -263,7 +263,7 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
             _buildTextField(
               controller: _headlineController,
               label: 'Professional Headline',
-              hint: 'e.g., Cardiologist at City Hospital',
+              hint: 'e.g., Specialist in Cardiology at City Hospital',
               icon: Icons.work_outline,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -371,7 +371,7 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
             _buildTextField(
               controller: _jobTitleController,
               label: 'Job Title',
-              hint: 'e.g., Senior Cardiologist',
+              hint: 'e.g., Senior Consultant - Cardiology',
               icon: Icons.work,
             ),
             const SizedBox(height: 20),
@@ -466,9 +466,13 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
                 icon: const Icon(Icons.add),
                 label: const Text('Add Experience'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Colors.blue, width: 2),
-                  foregroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                  side: const BorderSide(color: Colors.black, width: 1),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
                 ),
               ),
             ),
@@ -653,20 +657,20 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
               label: 'Specialization',
               value: _selectedSpecialization,
               items: [
-                'General',
-                'Pathologist',
-                'Cardiologist',
-                'Dermatologist',
-                'Pediatrician',
-                'Surgeon',
-                'Psychiatrist',
-                'Radiologist',
-                'Anesthesiologist',
-                'Oncologist',
-                'Neurologist',
-                'Orthopedic Surgeon',
-                'Gynecologist',
-                'Ophthalmologist',
+                'General Practitioner',
+                'Pathology',
+                'Cardiology',
+                'Dermatology',
+                'Pediatrics',
+                'General Surgery',
+                'Psychiatry',
+                'Radiology',
+                'Anesthesiology',
+                'Oncology',
+                'Neurology',
+                'Orthopedic Surgery',
+                'Gynecology',
+                'Ophthalmology',
                 'N/A',
               ],
               onChanged: (value) {
@@ -706,9 +710,13 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
                 icon: const Icon(Icons.add),
                 label: const Text('Add Qualification'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Colors.blue, width: 2),
-                  foregroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                  side: const BorderSide(color: Colors.black, width: 1),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
                 ),
               ),
             ),
@@ -918,9 +926,13 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
                 icon: const Icon(Icons.add),
                 label: const Text('Add Certification'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: Colors.blue, width: 2),
-                  foregroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                  side: const BorderSide(color: Colors.black, width: 1),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
                 ),
               ),
             ),
@@ -1950,8 +1962,12 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
               ElevatedButton(
                 onPressed: () => _uploadDocument(documentType),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[100],
-                  foregroundColor: Colors.blue[800],
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.blue,
+                  side: const BorderSide(color: Colors.blue, width: 1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   elevation: 0,
                 ),
                 child: const Text('Add Document'),
@@ -2310,10 +2326,14 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
               child: OutlinedButton(
                 onPressed: _previousStep,
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.grey),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: Colors.black, width: 1),
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
                 child: const Text('Back', style: TextStyle(color: Colors.grey)),
@@ -2326,8 +2346,11 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.black, width: 2),
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                side: const BorderSide(color: Colors.black, width: 1),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 24,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -2639,6 +2662,14 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
       // Add provider role to user
       await UserService.addRole(providerRole);
 
+      // Update user profile with location data
+      final updatedUser = currentUser.copyWith(
+        city: _cityController.text.trim(),
+        country: _countryController.text.trim(),
+        address: fullAddress,
+      );
+      await UserService.updateProfile(updatedUser);
+
       // Also create in old services for backward compatibility
       if (widget.providerType.category == ProviderCategory.individual) {
         final newProvider =
@@ -2647,7 +2678,7 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
               email: _emailController.text,
               phone: _phoneController.text,
               address: fullAddress,
-              specialization: primarySpecialization ?? 'General',
+              specialization: primarySpecialization ?? 'General Practitioner',
               experienceYears: totalExperienceYears,
               bio: _bioController.text,
               consultationFee:
@@ -2756,29 +2787,35 @@ class _ProviderRegistrationScreenState extends State<ProviderRegistrationScreen>
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Close dialog
-                  Navigator.of(context).pop();
-                  // Close registration screen
-                  Navigator.of(context).pop();
-                  // Close provider type selection screen
-                  Navigator.of(context).pop();
-                  // Close become provider screen - returns to profile
+                  // Close dialog first
                   Navigator.of(context).pop();
 
-                  // Show success snackbar on profile screen
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text(
-                        'Application submitted successfully! You will be notified once reviewed.',
-                      ),
-                      backgroundColor: Colors.green,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      duration: const Duration(seconds: 4),
-                    ),
-                  );
+                  // Navigate back to home screen, clearing all previous routes
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/home', (route) => false);
+
+                  // Capture context before async gap
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+                  // Show success snackbar
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    if (mounted) {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'Application submitted successfully! You will be notified once reviewed.',
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          duration: const Duration(seconds: 4),
+                        ),
+                      );
+                    }
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,

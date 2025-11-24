@@ -2,7 +2,7 @@ class AcademicQualification {
   final String id;
   String title; // Dr., Prof., Mr., Mrs., etc.
   String educationLevel; // Certificate, Diploma, Bachelor's, Master's, PhD, N/A
-  String specialization; // General, Pathologist, Cardiologist, etc.
+  String specialization; // General Practitioner, Pathology, Cardiology, etc.
   String? institution; // University/Institution name (optional)
   int? yearCompleted; // Year of completion (optional)
   String? fieldOfStudy; // Field of study (optional)
@@ -45,7 +45,11 @@ class AcademicQualification {
     final parts = <String>[];
     if (title.isNotEmpty) parts.add(title);
     if (educationLevel != 'N/A') parts.add(educationLevel);
-    if (specialization != 'General') parts.add('in $specialization');
+    if (specialization != 'General Practitioner' && specialization != 'N/A') {
+      parts.add('in $specialization');
+    } else if (specialization == 'General Practitioner') {
+      parts.add('- $specialization');
+    }
     if (institution != null && institution!.isNotEmpty) {
       parts.add('from $institution');
     }

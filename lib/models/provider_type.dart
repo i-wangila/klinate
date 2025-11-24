@@ -34,10 +34,10 @@ class ProviderTypeService {
       category: ProviderCategory.individual,
       examples: [
         'General Practitioner',
-        'Cardiologist',
-        'Pediatrician',
-        'Surgeon',
-        'Psychiatrist',
+        'Cardiology',
+        'Pediatrics',
+        'General Surgery',
+        'Psychiatry',
       ],
       requirements: [
         'Medical License',

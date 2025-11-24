@@ -524,8 +524,13 @@ class _ManageAdminAccountScreenState extends State<ManageAdminAccountScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.blue,
+              side: const BorderSide(color: Colors.blue, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Save'),
           ),
@@ -564,8 +569,13 @@ class _ManageAdminAccountScreenState extends State<ManageAdminAccountScreen> {
               _performDeactivation();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.orange,
+              side: const BorderSide(color: Colors.orange, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Deactivate'),
           ),
@@ -606,8 +616,13 @@ class _ManageAdminAccountScreenState extends State<ManageAdminAccountScreen> {
               _confirmRemoveAdminRole();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Remove Role'),
           ),
@@ -635,8 +650,13 @@ class _ManageAdminAccountScreenState extends State<ManageAdminAccountScreen> {
               _performRoleRemoval();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Confirm Remove'),
           ),

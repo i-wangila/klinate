@@ -628,9 +628,9 @@ class _EditProviderProfileScreenState extends State<EditProviderProfileScreen> {
         profileImageUrl: _profileImagePath,
       );
 
-      final success = HealthcareProviderService.updateProvider(updatedProvider);
+      await HealthcareProviderService.updateProvider(updatedProvider);
 
-      if (success && mounted) {
+      if (mounted) {
         Navigator.pop(context, updatedProvider);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

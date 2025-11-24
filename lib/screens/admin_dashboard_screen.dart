@@ -339,6 +339,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Colors.purple,
           onTap: () => Navigator.pushNamed(context, '/admin/activity-log'),
         ),
+        const SizedBox(height: 8),
+        _buildActionButton(
+          'Manage Reviews',
+          Icons.star_rate,
+          Colors.amber,
+          onTap: () => Navigator.pushNamed(context, '/admin/reviews'),
+        ),
       ],
     );
   }

@@ -36,9 +36,6 @@ class UserService {
         usersMap.forEach((key, value) {
           _users[key] = UserProfile.fromJson(value);
         });
-      } else {
-        // Add sample user for testing provider
-        _initializeSampleUser();
       }
 
       if (kDebugMode) {
@@ -124,6 +121,7 @@ class UserService {
 
   // Sign up new user
   static Future<AuthResult> signUp({
+    String title = '',
     required String firstName,
     required String lastName,
     required String email,
@@ -164,6 +162,7 @@ class UserService {
 
       // Create new user with patient role by default
       final user = UserProfile(
+        title: title,
         name: name,
         email: email.toLowerCase().trim(),
         phone: phone.trim(),
@@ -595,26 +594,6 @@ class UserService {
         print('Error restricting user access: $e');
       }
       return false;
-    }
-  }
-
-  // Initialize sample user for testing provider
-  static void _initializeSampleUser() {
-    final sampleUser = UserProfile(
-      id: 'user_sample_001',
-      name: 'Dr. Sarah Johnson',
-      email: 'dr.sarah@klinate.com',
-      phone: '+254712345678',
-      password: _hashPassword('password123'),
-      roles: [UserRole.patient, UserRole.doctor],
-      currentRole: UserRole.doctor,
-    );
-
-    _users[sampleUser.email] = sampleUser;
-    _saveUsers();
-
-    if (kDebugMode) {
-      print('Sample user initialized: ${sampleUser.email}');
     }
   }
 }

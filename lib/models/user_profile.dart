@@ -47,6 +47,7 @@ extension UserRoleExtension on UserRole {
 
 class UserProfile {
   final String id;
+  String title; // Mr., Mrs., Dr., Prof., etc.
   String name;
   String email;
   String phone;
@@ -58,6 +59,8 @@ class UserProfile {
   String dateOfBirth;
   String gender;
   String address;
+  String city;
+  String country;
   String emergencyContact;
   String bloodType;
   String? weight;
@@ -70,6 +73,7 @@ class UserProfile {
 
   UserProfile({
     String? id,
+    this.title = '',
     required this.name,
     required this.email,
     required this.phone,
@@ -81,6 +85,8 @@ class UserProfile {
     this.dateOfBirth = '',
     this.gender = '',
     this.address = '',
+    this.city = '',
+    this.country = '',
     this.emergencyContact = '',
     this.bloodType = '',
     this.weight,
@@ -109,9 +115,12 @@ class UserProfile {
   List<UserRole> get providerRoles =>
       roles.where((role) => role.isProvider).toList();
 
+  String get fullName => title.isEmpty ? name : '$title $name';
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'title': title,
       'name': name,
       'email': email,
       'phone': phone,
@@ -123,6 +132,8 @@ class UserProfile {
       'dateOfBirth': dateOfBirth,
       'gender': gender,
       'address': address,
+      'city': city,
+      'country': country,
       'emergencyContact': emergencyContact,
       'bloodType': bloodType,
       'weight': weight,
@@ -138,6 +149,7 @@ class UserProfile {
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       id: json['id'],
+      title: json['title'] ?? '',
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       phone: json['phone'] ?? '',
@@ -161,6 +173,8 @@ class UserProfile {
       dateOfBirth: json['dateOfBirth'] ?? '',
       gender: json['gender'] ?? '',
       address: json['address'] ?? '',
+      city: json['city'] ?? '',
+      country: json['country'] ?? '',
       emergencyContact: json['emergencyContact'] ?? '',
       bloodType: json['bloodType'] ?? '',
       weight: json['weight'],
@@ -179,6 +193,7 @@ class UserProfile {
 
   UserProfile copyWith({
     String? id,
+    String? title,
     String? name,
     String? email,
     String? phone,
@@ -190,6 +205,8 @@ class UserProfile {
     String? dateOfBirth,
     String? gender,
     String? address,
+    String? city,
+    String? country,
     String? emergencyContact,
     String? bloodType,
     String? weight,
@@ -200,6 +217,7 @@ class UserProfile {
   }) {
     return UserProfile(
       id: id ?? this.id,
+      title: title ?? this.title,
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
@@ -211,6 +229,8 @@ class UserProfile {
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       gender: gender ?? this.gender,
       address: address ?? this.address,
+      city: city ?? this.city,
+      country: country ?? this.country,
       emergencyContact: emergencyContact ?? this.emergencyContact,
       bloodType: bloodType ?? this.bloodType,
       weight: weight ?? this.weight,

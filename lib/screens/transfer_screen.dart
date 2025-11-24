@@ -195,11 +195,13 @@ class _TransferScreenState extends State<TransferScreen> {
       child: ElevatedButton(
         onPressed: _isProcessing ? null : _processTransfer,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.blue,
+          side: const BorderSide(color: Colors.blue, width: 1),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(25),
           ),
+          elevation: 0,
         ),
         child: _isProcessing
             ? const SizedBox(
@@ -207,7 +209,7 @@ class _TransferScreenState extends State<TransferScreen> {
                 width: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                 ),
               )
             : Text(

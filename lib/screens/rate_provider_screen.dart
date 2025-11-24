@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/appointment.dart';
 import '../models/review.dart';
+import '../models/user_profile.dart';
 import '../services/review_service.dart';
 import '../services/user_service.dart';
+import '../services/provider_service.dart';
 
 class RateProviderScreen extends StatefulWidget {
   final Appointment appointment;
@@ -145,19 +147,19 @@ class _RateProviderScreenState extends State<RateProviderScreen> {
           style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
         const SizedBox(height: 24),
-        Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (index) {
-              final starNumber = index + 1;
-              return GestureDetector(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(5, (index) {
+            final starNumber = index + 1;
+            return Flexible(
+              child: GestureDetector(
                 onTap: () {
                   setState(() {
                     _selectedRating = starNumber;
                   });
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   child: Icon(
                     starNumber <= _selectedRating
                         ? Icons.star
@@ -168,9 +170,9 @@ class _RateProviderScreenState extends State<RateProviderScreen> {
                         : Colors.grey[400],
                   ),
                 ),
-              );
-            }),
-          ),
+              ),
+            );
+          }),
         ),
         const SizedBox(height: 16),
         if (_selectedRating > 0)
@@ -385,14 +387,34 @@ class _RateProviderScreenState extends State<RateProviderScreen> {
     });
 
     try {
+      final currentUser = UserService.currentUser;
+
+      // Validate user is logged in
+      if (currentUser == null) {
+        throw Exception('User not logged in');
+      }
+
+      // Only patients can write reviews
+      if (currentUser.currentRole != UserRole.patient) {
+        throw Exception('Only patients can write reviews');
+      }
+
+      // Get provider to check if user is reviewing themselves
+      final provider = ProviderService.getProviderById(
+        widget.appointment.providerId,
+      );
+      if (provider != null && provider.userId == currentUser.id) {
+        throw Exception('You cannot review your own business account');
+      }
+
       // Simulate API call
       await Future.delayed(const Duration(seconds: 1));
 
       final review = Review(
         id: ReviewService.generateReviewId(),
         providerId: widget.appointment.providerId,
-        patientId: UserService.currentUser?.email ?? 'current_user',
-        patientName: UserService.currentUser?.name ?? 'Current User',
+        patientId: currentUser.id,
+        patientName: currentUser.name,
         rating: _selectedRating,
         comment: _commentController.text.trim(),
         createdAt: DateTime.now(),
@@ -401,7 +423,7 @@ class _RateProviderScreenState extends State<RateProviderScreen> {
         providerName: widget.appointment.providerName,
       );
 
-      ReviewService.addReview(review);
+      await ReviewService.addReview(review);
 
       if (mounted) {
         Navigator.pop(context, true); // Return true to indicate success

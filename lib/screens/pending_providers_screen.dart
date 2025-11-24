@@ -67,8 +67,13 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.green,
+              side: const BorderSide(color: Colors.green, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Approve'),
           ),
@@ -150,8 +155,13 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
               Navigator.pop(context, true);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Reject'),
           ),
@@ -375,11 +385,13 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
                     icon: const Icon(Icons.check, size: 18),
                     label: const Text('Approve'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.green,
+                      side: const BorderSide(color: Colors.green, width: 1),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                      elevation: 0,
                     ),
                   ),
                 ),
@@ -664,8 +676,13 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.green,
+              side: const BorderSide(color: Colors.green, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Approve'),
           ),
@@ -745,8 +762,13 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
               Navigator.pop(context, true);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red, width: 1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
             ),
             child: const Text('Reject'),
           ),

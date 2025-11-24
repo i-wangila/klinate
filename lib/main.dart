@@ -10,6 +10,7 @@ import 'screens/user_management_screen.dart';
 import 'screens/activity_log_screen.dart';
 import 'screens/reports_screen.dart';
 import 'screens/admin_management_screen.dart';
+import 'screens/admin_reviews_screen.dart';
 import 'screens/provider_dashboard_screen.dart';
 import 'services/user_service.dart';
 import 'services/message_service.dart';
@@ -18,6 +19,7 @@ import 'services/admin_service.dart';
 import 'services/audit_service.dart';
 import 'services/provider_service.dart';
 import 'services/appointment_service.dart';
+import 'services/review_service.dart';
 import 'middleware/auth_guard.dart';
 
 void main() async {
@@ -32,6 +34,7 @@ void main() async {
   await AdminService.initialize();
   await AuditService.initialize();
   await ProviderService.initialize();
+  await ReviewService.initialize();
   await AppointmentService.loadAppointments();
   runApp(const KlinateApp());
 }
@@ -88,6 +91,10 @@ class KlinateApp extends StatelessWidget {
           case '/admin/admin-management':
             return MaterialPageRoute(
               builder: (context) => const AdminManagementScreen(),
+            );
+          case '/admin/reviews':
+            return MaterialPageRoute(
+              builder: (context) => const AdminReviewsScreen(),
             );
           case '/provider-dashboard':
             return MaterialPageRoute(

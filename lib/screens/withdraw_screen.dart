@@ -383,8 +383,13 @@ class _MpesaWithdrawalDialogState extends State<_MpesaWithdrawalDialog> {
         ElevatedButton(
           onPressed: _isProcessing ? null : _processMpesaWithdrawal,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.green,
+            side: const BorderSide(color: Colors.green, width: 1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+            elevation: 0,
           ),
           child: _isProcessing
               ? const SizedBox(
@@ -392,7 +397,7 @@ class _MpesaWithdrawalDialogState extends State<_MpesaWithdrawalDialog> {
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                   ),
                 )
               : const Text('Withdraw'),

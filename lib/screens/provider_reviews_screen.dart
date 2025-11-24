@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/review.dart';
+import '../models/user_profile.dart';
 import '../services/review_service.dart';
 import '../services/user_service.dart';
+import '../services/provider_service.dart';
 
 class ProviderReviewsScreen extends StatefulWidget {
   final String providerId;
@@ -84,10 +86,15 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _scrollToReviewForm,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.blue,
         icon: const Icon(Icons.rate_review),
         label: const Text('Write Review'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+          side: const BorderSide(color: Colors.blue, width: 1),
+        ),
+        elevation: 2,
       ),
     );
   }
@@ -698,14 +705,32 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
     });
 
     try {
+      final currentUser = UserService.currentUser;
+
+      // Validate user is logged in
+      if (currentUser == null) {
+        throw Exception('User not logged in');
+      }
+
+      // Only patients can write reviews
+      if (currentUser.currentRole != UserRole.patient) {
+        throw Exception('Only patients can write reviews');
+      }
+
+      // Get provider to check if user is reviewing themselves
+      final provider = ProviderService.getProviderById(widget.providerId);
+      if (provider != null && provider.userId == currentUser.id) {
+        throw Exception('You cannot review your own business account');
+      }
+
       // Simulate API call
       await Future.delayed(const Duration(seconds: 1));
 
       final review = Review(
         id: ReviewService.generateReviewId(),
         providerId: widget.providerId,
-        patientId: UserService.currentUser?.email ?? 'current_user',
-        patientName: UserService.currentUser?.name ?? 'Current User',
+        patientId: currentUser.id,
+        patientName: currentUser.name,
         rating: _selectedRating,
         comment: _commentController.text.trim(),
         createdAt: DateTime.now(),
@@ -715,7 +740,7 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
         providerName: widget.providerName,
       );
 
-      ReviewService.addReview(review);
+      await ReviewService.addReview(review);
 
       // Reload reviews to show the new one
       setState(() {

@@ -24,6 +24,18 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+  String _selectedTitle = 'Mr.';
+
+  final List<String> _titles = [
+    'Mr.',
+    'Mrs.',
+    'Ms.',
+    'Miss',
+    'Dr.',
+    'Prof.',
+    'Rev.',
+    'Hon.',
+  ];
 
   @override
   void initState() {
@@ -142,6 +154,13 @@ class _AuthScreenState extends State<AuthScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               if (!_isSignIn) ...[
+                                _buildTitleDropdown(),
+                                SizedBox(
+                                  height: ResponsiveUtils.getResponsiveSpacing(
+                                    context,
+                                    12,
+                                  ),
+                                ),
                                 _buildTextField(
                                   controller: _firstNameController,
                                   hintText: 'First Name',
@@ -414,6 +433,55 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  Widget _buildTitleDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedTitle,
+      decoration: InputDecoration(
+        hintText: 'Title',
+        hintStyle: TextStyle(
+          color: Colors.grey,
+          fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
+        ),
+        prefixIcon: Icon(
+          Icons.person,
+          color: Colors.grey,
+          size: ResponsiveUtils.isSmallScreen(context) ? 20 : 24,
+        ),
+        border: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.black, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: ResponsiveUtils.getResponsiveSpacing(context, 12),
+        ),
+        isDense: ResponsiveUtils.isSmallScreen(context),
+      ),
+      items: _titles.map((String title) {
+        return DropdownMenuItem<String>(
+          value: title,
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: ResponsiveUtils.getResponsiveFontSize(context, 16),
+            ),
+          ),
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        if (newValue != null) {
+          setState(() {
+            _selectedTitle = newValue;
+          });
+        }
+      },
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
@@ -613,6 +681,7 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         // Sign Up
         final result = await UserService.signUp(
+          title: _selectedTitle,
           firstName: _firstNameController.text.trim(),
           lastName: _lastNameController.text.trim(),
           email: _emailController.text.trim(),

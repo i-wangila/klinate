@@ -156,25 +156,27 @@ class _RateAnyProviderScreenState extends State<RateAnyProviderScreen> {
         ),
         const SizedBox(height: 16),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: List.generate(5, (index) {
             final starNumber = index + 1;
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedRating = starNumber;
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Icon(
-                  _selectedRating >= starNumber
-                      ? Icons.star
-                      : Icons.star_border,
-                  size: 48,
-                  color: _selectedRating >= starNumber
-                      ? Colors.amber
-                      : Colors.grey[400],
+            return Flexible(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedRating = starNumber;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Icon(
+                    _selectedRating >= starNumber
+                        ? Icons.star
+                        : Icons.star_border,
+                    size: 44,
+                    color: _selectedRating >= starNumber
+                        ? Colors.amber
+                        : Colors.grey[400],
+                  ),
                 ),
               ),
             );
@@ -307,6 +309,16 @@ class _RateAnyProviderScreenState extends State<RateAnyProviderScreen> {
         throw Exception('User not logged in');
       }
 
+      // Prevent providers from reviewing their own accounts
+      if (widget.provider.userId == currentUser.id) {
+        throw Exception('You cannot review your own business account');
+      }
+
+      // Only patients can write reviews
+      if (currentUser.currentRole != UserRole.patient) {
+        throw Exception('Only patients can write reviews');
+      }
+
       // Get provider name from user service
       final users = UserService.getAllUsers();
       final providerUser = users.firstWhere(
@@ -327,7 +339,7 @@ class _RateAnyProviderScreenState extends State<RateAnyProviderScreen> {
         providerName: providerUser.name,
       );
 
-      ReviewService.addReview(review);
+      await ReviewService.addReview(review);
 
       // Update provider rating in the provider service
       // The rating will be recalculated from all reviews

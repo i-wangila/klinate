@@ -8,6 +8,7 @@ import '../models/message.dart';
 import '../models/work_experience.dart';
 import '../services/provider_service.dart';
 import '../services/user_service.dart';
+import '../services/review_service.dart';
 import 'chat_screen.dart';
 import 'book_provider_appointment_screen.dart';
 import 'rate_any_provider_screen.dart';
@@ -25,6 +26,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   ProviderProfile? provider;
   UserProfile? user;
   bool isLoading = true;
+  double _currentRating = 0.0;
+  int _totalReviews = 0;
 
   @override
   void initState() {
@@ -32,13 +35,23 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     _loadProvider();
   }
 
+  void _calculateRating() {
+    if (provider != null) {
+      final providerRating = ReviewService.getProviderRating(provider!.id);
+      _currentRating = providerRating.averageRating;
+      _totalReviews = providerRating.totalReviews;
+    }
+  }
+
   Future<void> _loadProvider() async {
     // Ensure services are initialized
     await ProviderService.initialize();
     await UserService.initialize();
+    await ReviewService.initialize();
 
     setState(() {
       provider = ProviderService.getProviderById(widget.providerId);
+      _calculateRating();
       if (provider != null) {
         final users = UserService.getAllUsers();
         user = users.firstWhere(
@@ -193,7 +206,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            user!.name,
+            user!.fullName,
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -216,7 +229,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               Icon(Icons.star, color: Colors.amber, size: 20),
               const SizedBox(width: 4),
               Text(
-                provider!.rating.toStringAsFixed(1),
+                _currentRating.toStringAsFixed(1),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -224,7 +237,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               ),
               const SizedBox(width: 4),
               Text(
-                '(${provider!.totalReviews} reviews)',
+                '($_totalReviews reviews)',
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
               const Spacer(),
@@ -374,8 +387,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       }
 
       // Add specialization
-      if (qual.specialization != 'General' && qual.specialization != 'N/A') {
+      if (qual.specialization != 'General Practitioner' &&
+          qual.specialization != 'N/A') {
         parts.add('in ${qual.specialization}');
+      } else if (qual.specialization == 'General Practitioner') {
+        parts.add('- ${qual.specialization}');
       }
 
       // Add field of study
@@ -612,25 +628,30 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               ),
               Row(
                 children: [
-                  OutlinedButton.icon(
-                    onPressed: _rateProvider,
-                    icon: Icon(Icons.edit, size: 16, color: Colors.blue[700]),
-                    label: Text(
-                      'Write Review',
-                      style: TextStyle(fontSize: 13, color: Colors.blue[700]),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.blue[300]!),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                  // Only show "Write Review" button if user is not viewing their own profile
+                  if (UserService.currentUser?.id != provider?.userId &&
+                      UserService.currentUser?.currentRole == UserRole.patient)
+                    OutlinedButton.icon(
+                      onPressed: _rateProvider,
+                      icon: Icon(Icons.edit, size: 16, color: Colors.blue[700]),
+                      label: Text(
+                        'Write Review',
+                        style: TextStyle(fontSize: 13, color: Colors.blue[700]),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.blue[300]!),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
+                  if (UserService.currentUser?.id != provider?.userId &&
+                      UserService.currentUser?.currentRole == UserRole.patient)
+                    const SizedBox(width: 8),
                   TextButton(
                     onPressed: () {
                       // Navigate to all reviews
@@ -650,7 +671,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                provider!.rating.toStringAsFixed(1),
+                _currentRating.toStringAsFixed(1),
                 style: const TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
@@ -664,7 +685,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   Row(
                     children: List.generate(5, (index) {
                       return Icon(
-                        index < provider!.rating.floor()
+                        index < _currentRating.floor()
                             ? Icons.star
                             : Icons.star_border,
                         color: Colors.amber,
@@ -674,7 +695,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${provider!.totalReviews} reviews',
+                    '$_totalReviews reviews',
                     style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                 ],
@@ -682,22 +703,52 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          // Sample Reviews (you can fetch real reviews from ReviewService)
-          _buildReviewCard(
-            'SK',
-            'Sarah Kimani',
-            'Nov 12, 2025',
-            5,
-            'Excellent hospital with state-of-the-art facilities. The staff was very professional and caring. Highly recommend!',
-          ),
-          const SizedBox(height: 16),
-          _buildReviewCard(
-            'JM',
-            'James Mwangi',
-            'Nov 06, 2025',
-            4,
-            'Good hospital with modern equipment. The waiting time was reasonable and the doctors were knowledgeable.',
-          ),
+          // Real Reviews from ReviewService
+          ...ReviewService.getReviewsByProvider(provider!.id)
+              .take(2)
+              .map(
+                (review) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _buildReviewCard(
+                    review.patientName[0].toUpperCase(),
+                    review.patientName,
+                    _formatReviewDate(review.createdAt),
+                    review.rating,
+                    review.comment,
+                  ),
+                ),
+              ),
+          // Show message if no reviews yet
+          if (ReviewService.getReviewsByProvider(provider!.id).isEmpty)
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.star_border, size: 48, color: Colors.grey[400]),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No reviews yet',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Be the first to review this provider',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -784,13 +835,25 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
   Widget _buildContactInformationSection() {
     // Get contact info from user profile
-    final contactName = user?.name ?? 'Provider';
+    final contactName = user?.fullName ?? 'Provider';
     final contactPhone = user?.phone ?? '';
     final contactEmail = user?.email ?? '';
-    final contactAddress = '';
+
+    // Build location string from city and country
+    String contactAddress = '';
+    if (user?.city != null && user!.city.isNotEmpty) {
+      contactAddress = user!.city;
+      if (user?.country != null && user!.country.isNotEmpty) {
+        contactAddress += ', ${user!.country}';
+      }
+    } else if (user?.country != null && user!.country.isNotEmpty) {
+      contactAddress = user!.country;
+    }
 
     // Don't show section if no contact info available
-    if (contactPhone.isEmpty && contactEmail.isEmpty) {
+    if (contactPhone.isEmpty &&
+        contactEmail.isEmpty &&
+        contactAddress.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -1274,8 +1337,8 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     final message = Message(
       id: 'provider_${provider!.id}',
       senderId: provider!.id,
-      senderName: user!.name,
-      content: 'Start a conversation with ${user!.name}',
+      senderName: user!.fullName,
+      content: 'Start a conversation with ${user!.fullName}',
       timestamp: DateTime.now(),
       type: MessageType.text,
       category: MessageCategory.healthcareProvider,
@@ -1298,7 +1361,71 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     );
   }
 
+  String _formatReviewDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays == 0) {
+      return 'Today';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+    }
+  }
+
   void _rateProvider() {
+    final currentUser = UserService.currentUser;
+
+    // Check if user is logged in
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to write a review'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Check if current user is the provider trying to review themselves
+    if (provider!.userId == currentUser.id) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot review your own business account'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Check if user is currently in a provider role
+    if (currentUser.currentRole != UserRole.patient) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please switch to patient mode to write reviews'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(

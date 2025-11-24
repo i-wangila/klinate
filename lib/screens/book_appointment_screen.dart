@@ -541,14 +541,17 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.grey),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.grey,
+                    side: const BorderSide(color: Colors.grey, width: 1),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(25),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 0,
                   ),
                   child: const Text(
                     'Cancel',
@@ -566,7 +569,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(25),
                       side: const BorderSide(color: Colors.black, width: 1),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16),

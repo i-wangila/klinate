@@ -573,15 +573,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       return Row(
         children: [
           Expanded(
-            child: OutlinedButton(
+            child: ElevatedButton(
               onPressed: () => _bookAgain(appointment),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.black),
+                side: const BorderSide(color: Colors.black, width: 1),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                elevation: 0,
               ),
               child: const Text(
                 'Book Again',
@@ -591,15 +593,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: OutlinedButton.icon(
+            child: ElevatedButton.icon(
               onPressed: () => _rateProvider(appointment),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.black),
+                side: const BorderSide(color: Colors.black, width: 1),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                elevation: 0,
               ),
               icon: const Icon(Icons.star, size: 16),
               label: const Text(
@@ -615,7 +619,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       return Row(
         children: [
           Expanded(
-            child: OutlinedButton(
+            child: ElevatedButton(
               onPressed: () {
                 // Handle action based on communication type
                 if (appointment.communicationType == CommunicationType.video) {
@@ -627,13 +631,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                   _showAppointmentDetails(appointment);
                 }
               },
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.black),
+                side: const BorderSide(color: Colors.black, width: 1),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                elevation: 0,
               ),
               child: Text(
                 _getActionButtonLabel(appointment.communicationType),
@@ -648,15 +654,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: OutlinedButton(
+            child: ElevatedButton(
               onPressed: () => _rescheduleAppointment(appointment),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
                 foregroundColor: Colors.blue,
-                side: const BorderSide(color: Colors.blue),
+                side: const BorderSide(color: Colors.blue, width: 1),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                elevation: 0,
               ),
               child: const Text(
                 'Reschedule',
@@ -668,15 +676,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: OutlinedButton(
+            child: ElevatedButton(
               onPressed: () => _cancelAppointment(appointment),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
                 foregroundColor: Colors.red,
-                side: const BorderSide(color: Colors.red),
+                side: const BorderSide(color: Colors.red, width: 1),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                elevation: 0,
               ),
               child: const Text(
                 'Cancel',
@@ -693,15 +703,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       return Row(
         children: [
           Expanded(
-            child: OutlinedButton(
+            child: ElevatedButton(
               onPressed: () => _rateProvider(appointment),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
-                side: const BorderSide(color: Colors.black),
+                side: const BorderSide(color: Colors.black, width: 1),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                elevation: 0,
               ),
               child: const Text(
                 'Rate Provider',

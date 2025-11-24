@@ -1,196 +1,49 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/review.dart';
 
 class ReviewService {
-  static final List<Review> _reviews = [
-    // Doctor Reviews
-    Review(
-      id: '1',
-      providerId: 'dr_sarah_21',
-      patientId: 'patient_john',
-      patientName: 'John Doe',
-      rating: 5,
-      comment:
-          'Excellent doctor! Very professional and caring. Explained everything clearly and provided great treatment.',
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
-      appointmentId: 'apt_1',
-      providerType: ProviderType.doctor,
-      providerName: 'Dr. Sarah Mwangi',
-    ),
-    Review(
-      id: '2',
-      providerId: 'dr_sarah_21',
-      patientId: 'patient_mary',
-      patientName: 'Mary Smith',
-      rating: 4,
-      comment:
-          'Good consultation. Dr. Sarah was knowledgeable and helpful. Would recommend.',
-      createdAt: DateTime.now().subtract(const Duration(days: 10)),
-      appointmentId: 'apt_2',
-      providerType: ProviderType.doctor,
-      providerName: 'Dr. Sarah Mwangi',
-    ),
-    Review(
-      id: '3',
-      providerId: 'dr_john_45',
-      patientId: 'patient_alice',
-      patientName: 'Alice Johnson',
-      rating: 5,
-      comment:
-          'Outstanding service! Dr. John was very thorough and took time to answer all my questions.',
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-      appointmentId: 'apt_3',
-      providerType: ProviderType.doctor,
-      providerName: 'Dr. John Kamau',
-    ),
-    Review(
-      id: '4',
-      providerId: 'dr_john_45',
-      patientId: 'patient_bob',
-      patientName: 'Bob Wilson',
-      rating: 4,
-      comment: 'Professional and efficient. Good experience overall.',
-      createdAt: DateTime.now().subtract(const Duration(days: 7)),
-      appointmentId: 'apt_4',
-      providerType: ProviderType.doctor,
-      providerName: 'Dr. John Kamau',
-    ),
-    Review(
-      id: '9',
-      providerId: 'mary_njeri_67',
-      patientId: 'patient_david',
-      patientName: 'David Kiprotich',
-      rating: 5,
-      comment:
-          'Mary is an amazing nutritionist! She helped me create a sustainable diet plan that actually works. Lost 10kg in 3 months!',
-      createdAt: DateTime.now().subtract(const Duration(days: 12)),
-      appointmentId: 'apt_9',
-      providerType: ProviderType.nutritionist,
-      providerName: 'Mary Njeri',
-    ),
-    Review(
-      id: '10',
-      providerId: 'mary_njeri_67',
-      patientId: 'patient_lucy',
-      patientName: 'Lucy Wanjiru',
-      rating: 4,
-      comment:
-          'Very knowledgeable and patient. The meal plans are practical and easy to follow.',
-      createdAt: DateTime.now().subtract(const Duration(days: 18)),
-      appointmentId: 'apt_10',
-      providerType: ProviderType.nutritionist,
-      providerName: 'Mary Njeri',
-    ),
+  static const String _storageKey = 'klinate_reviews';
+  static final List<Review> _reviews = [];
+  static bool _isInitialized = false;
 
-    // Hospital Reviews
-    Review(
-      id: '5',
-      providerId: 'nairobi_hospital',
-      patientId: 'patient_sarah',
-      patientName: 'Sarah Kimani',
-      rating: 5,
-      comment:
-          'Excellent hospital with state-of-the-art facilities. The staff was very professional and caring. Highly recommend!',
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      appointmentId: 'apt_5',
-      providerType: ProviderType.hospital,
-      providerName: 'Nairobi Hospital',
-    ),
-    Review(
-      id: '6',
-      providerId: 'nairobi_hospital',
-      patientId: 'patient_james',
-      patientName: 'James Mwangi',
-      rating: 4,
-      comment:
-          'Good hospital with modern equipment. The waiting time was reasonable and the doctors were knowledgeable.',
-      createdAt: DateTime.now().subtract(const Duration(days: 8)),
-      appointmentId: 'apt_6',
-      providerType: ProviderType.hospital,
-      providerName: 'Nairobi Hospital',
-    ),
-    Review(
-      id: '7',
-      providerId: 'aga_khan_hospital',
-      patientId: 'patient_grace',
-      patientName: 'Grace Wanjiku',
-      rating: 5,
-      comment:
-          'Outstanding service! The hospital is clean, well-organized, and the medical staff is top-notch. Worth every penny.',
-      createdAt: DateTime.now().subtract(const Duration(days: 4)),
-      appointmentId: 'apt_7',
-      providerType: ProviderType.hospital,
-      providerName: 'Aga Khan University Hospital',
-    ),
+  // Initialize the service
+  static Future<void> initialize() async {
+    if (_isInitialized) return;
+    await _loadReviews();
+    _isInitialized = true;
+  }
 
-    // Pharmacy Reviews
-    Review(
-      id: '8',
-      providerId: 'goodlife_pharmacy',
-      patientId: 'patient_peter',
-      patientName: 'Peter Ochieng',
-      rating: 4,
-      comment:
-          'Great pharmacy with a wide selection of medications. The pharmacist was helpful in explaining the prescriptions.',
-      createdAt: DateTime.now().subtract(const Duration(days: 6)),
-      appointmentId: 'apt_8',
-      providerType: ProviderType.pharmacy,
-      providerName: 'Goodlife Pharmacy',
-    ),
-    Review(
-      id: '11',
-      providerId: 'goodlife_pharmacy',
-      patientId: 'patient_ann',
-      patientName: 'Ann Wambui',
-      rating: 5,
-      comment:
-          'Excellent service! They have everything I need and the staff is very knowledgeable about medications. Home delivery is a plus!',
-      createdAt: DateTime.now().subtract(const Duration(days: 14)),
-      appointmentId: 'apt_11',
-      providerType: ProviderType.pharmacy,
-      providerName: 'Goodlife Pharmacy',
-    ),
+  // Load reviews from storage
+  static Future<void> _loadReviews() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final reviewsJson = prefs.getString(_storageKey);
 
-    // Laboratory Reviews
-    Review(
-      id: '12',
-      providerId: 'lancet_kenya',
-      patientId: 'patient_michael',
-      patientName: 'Michael Otieno',
-      rating: 5,
-      comment:
-          'Very professional lab! Quick results, accurate testing, and the staff explained everything clearly. Home sample collection was convenient.',
-      createdAt: DateTime.now().subtract(const Duration(days: 9)),
-      appointmentId: 'apt_12',
-      providerType: ProviderType.laboratory,
-      providerName: 'Lancet Kenya',
-    ),
-    Review(
-      id: '13',
-      providerId: 'lancet_kenya',
-      patientId: 'patient_faith',
-      patientName: 'Faith Njoki',
-      rating: 4,
-      comment:
-          'Good laboratory services. Results came back quickly and were well-formatted. The facility is clean and modern.',
-      createdAt: DateTime.now().subtract(const Duration(days: 16)),
-      appointmentId: 'apt_13',
-      providerType: ProviderType.laboratory,
-      providerName: 'Lancet Kenya',
-    ),
-    Review(
-      id: '14',
-      providerId: 'lancet_kenya',
-      patientId: 'patient_samuel',
-      patientName: 'Samuel Kipchoge',
-      rating: 5,
-      comment:
-          'Outstanding lab! The technicians are skilled and the equipment is top-notch. Got my comprehensive health screening done here.',
-      createdAt: DateTime.now().subtract(const Duration(days: 21)),
-      appointmentId: 'apt_14',
-      providerType: ProviderType.laboratory,
-      providerName: 'Lancet Kenya',
-    ),
-  ];
+      if (reviewsJson != null && reviewsJson.isNotEmpty) {
+        final List<dynamic> reviewsList = json.decode(reviewsJson);
+        _reviews.clear();
+        _reviews.addAll(
+          reviewsList.map((json) => Review.fromJson(json)).toList(),
+        );
+      }
+    } catch (e) {
+      // Handle loading error silently
+    }
+  }
+
+  // Save reviews to storage
+  static Future<void> _saveReviews() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final reviewsJson = json.encode(
+        _reviews.map((review) => review.toJson()).toList(),
+      );
+      await prefs.setString(_storageKey, reviewsJson);
+    } catch (e) {
+      // Handle save error silently
+    }
+  }
 
   static List<Review> getAllReviews() => List.from(_reviews);
 
@@ -212,21 +65,24 @@ class ReviewService {
     }
   }
 
-  static void addReview(Review review) {
+  static Future<void> addReview(Review review) async {
     _reviews.add(review);
+    await _saveReviews();
   }
 
-  static void updateReview(Review updatedReview) {
+  static Future<void> updateReview(Review updatedReview) async {
     final index = _reviews.indexWhere(
       (review) => review.id == updatedReview.id,
     );
     if (index != -1) {
       _reviews[index] = updatedReview;
+      await _saveReviews();
     }
   }
 
-  static void deleteReview(String reviewId) {
+  static Future<void> deleteReview(String reviewId) async {
     _reviews.removeWhere((review) => review.id == reviewId);
+    await _saveReviews();
   }
 
   static ProviderRating getProviderRating(String providerId) {

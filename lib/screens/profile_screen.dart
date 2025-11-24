@@ -261,7 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 6),
             ResponsiveUtils.safeText(
-              UserService.currentUser?.name ?? 'Isaac',
+              UserService.currentUser?.fullName ?? 'Isaac',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -275,7 +275,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton(
+              child: ElevatedButton(
                 onPressed: () async {
                   final result = await Navigator.push(
                     context,
@@ -290,12 +290,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     });
                   }
                 },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.black),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: Colors.black, width: 1),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  elevation: 0,
                 ),
                 child: Text(
                   'Edit Profile',
@@ -1405,7 +1408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              providerUser.name,
+                              providerUser.fullName,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

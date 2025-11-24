@@ -20,7 +20,19 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   late TextEditingController _bloodTypeController;
 
   String _selectedGender = '';
+  String _selectedTitle = 'Mr.';
   bool _isLoading = false;
+
+  final List<String> _titles = [
+    'Mr.',
+    'Mrs.',
+    'Ms.',
+    'Miss',
+    'Dr.',
+    'Prof.',
+    'Rev.',
+    'Hon.',
+  ];
   @override
   void initState() {
     super.initState();
@@ -45,6 +57,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     _dateOfBirthController = TextEditingController(text: user.dateOfBirth);
     _bloodTypeController = TextEditingController(text: user.bloodType);
     _selectedGender = user.gender;
+    _selectedTitle = user.title.isEmpty ? 'Mr.' : user.title;
   }
 
   @override
@@ -81,6 +94,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            _buildTitleDropdown(),
+            const SizedBox(height: 16),
             _buildTextField('Full Name', _nameController, Icons.person),
             const SizedBox(height: 16),
             _buildTextField('Email', _emailController, Icons.email),
@@ -118,6 +133,38 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTitleDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedTitle,
+      decoration: InputDecoration(
+        labelText: 'Title',
+        prefixIcon: const Icon(Icons.person, color: Colors.grey),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.grey),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black, width: 2),
+        ),
+      ),
+      items: _titles.map((String title) {
+        return DropdownMenuItem<String>(value: title, child: Text(title));
+      }).toList(),
+      onChanged: (String? newValue) {
+        if (newValue != null) {
+          setState(() {
+            _selectedTitle = newValue;
+          });
+        }
+      },
     );
   }
 
@@ -272,6 +319,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     try {
       final currentUser = UserService.currentUser!;
       final updatedProfile = currentUser.copyWith(
+        title: _selectedTitle,
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
