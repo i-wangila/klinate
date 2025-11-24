@@ -62,6 +62,7 @@ class Document {
   final DocumentStatus status;
   final String? rejectionReason;
   final String? notes;
+  final String? providerId; // ID of the provider who uploaded this document
 
   Document({
     required this.id,
@@ -76,6 +77,7 @@ class Document {
     this.status = DocumentStatus.pending,
     this.rejectionReason,
     this.notes,
+    this.providerId,
   });
 
   // Helper methods
@@ -215,6 +217,7 @@ class Document {
       'status': status.toString(),
       'rejectionReason': rejectionReason,
       'notes': notes,
+      'providerId': providerId,
     };
   }
 
@@ -241,6 +244,7 @@ class Document {
       ),
       rejectionReason: json['rejectionReason'],
       notes: json['notes'],
+      providerId: json['providerId'],
     );
   }
 
@@ -258,6 +262,7 @@ class Document {
     DocumentStatus? status,
     String? rejectionReason,
     String? notes,
+    String? providerId,
   }) {
     return Document(
       id: id ?? this.id,
@@ -272,6 +277,7 @@ class Document {
       status: status ?? this.status,
       rejectionReason: rejectionReason ?? this.rejectionReason,
       notes: notes ?? this.notes,
+      providerId: providerId ?? this.providerId,
     );
   }
 }

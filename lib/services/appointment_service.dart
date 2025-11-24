@@ -286,4 +286,56 @@ class AppointmentService {
 
     return '$month $day, $year at $hour:$minute $period';
   }
+
+  // Clear completed appointments
+  static Future<bool> clearCompletedAppointments() async {
+    try {
+      _appointments.removeWhere(
+        (apt) => apt.status == AppointmentStatus.completed,
+      );
+      await _saveAppointments();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Clear cancelled appointments
+  static Future<bool> clearCancelledAppointments() async {
+    try {
+      _appointments.removeWhere(
+        (apt) => apt.status == AppointmentStatus.cancelled,
+      );
+      await _saveAppointments();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Clear all appointment history (completed and cancelled)
+  static Future<bool> clearAllHistory() async {
+    try {
+      _appointments.removeWhere(
+        (apt) =>
+            apt.status == AppointmentStatus.completed ||
+            apt.status == AppointmentStatus.cancelled,
+      );
+      await _saveAppointments();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Clear all appointments (use with caution)
+  static Future<bool> clearAllAppointments() async {
+    try {
+      _appointments.clear();
+      await _saveAppointments();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

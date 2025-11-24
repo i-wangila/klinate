@@ -11,7 +11,6 @@ import '../services/call_service.dart';
 import '../services/message_service.dart';
 import '../services/user_service.dart';
 import '../utils/responsive_utils.dart';
-import 'call_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final Message message;
@@ -488,22 +487,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _startVideoCall() async {
     try {
-      final callSession = await CallService.startCall(
-        providerId: widget.message.senderId,
-        providerName: widget.message.senderName,
-        callType: CallType.video,
-        patientId: 'current_user',
-        patientName: 'You',
-      );
-
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CallScreen(callSession: callSession),
-          ),
-        );
+      final currentUser = UserService.currentUser;
+      if (currentUser == null) {
+        throw Exception('User not logged in');
       }
+
+      await CallService.initiateCall(
+        context: context,
+        callerId: currentUser.id,
+        callerName: currentUser.name,
+        calleeId: widget.message.senderId,
+        calleeName: widget.message.senderName,
+        isVideoCall: true,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -518,22 +514,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _startVoiceCall() async {
     try {
-      final callSession = await CallService.startCall(
-        providerId: widget.message.senderId,
-        providerName: widget.message.senderName,
-        callType: CallType.voice,
-        patientId: 'current_user',
-        patientName: 'You',
-      );
-
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CallScreen(callSession: callSession),
-          ),
-        );
+      final currentUser = UserService.currentUser;
+      if (currentUser == null) {
+        throw Exception('User not logged in');
       }
+
+      await CallService.initiateCall(
+        context: context,
+        callerId: currentUser.id,
+        callerName: currentUser.name,
+        calleeId: widget.message.senderId,
+        calleeName: widget.message.senderName,
+        isVideoCall: false,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

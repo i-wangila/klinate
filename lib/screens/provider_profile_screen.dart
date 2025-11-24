@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/provider_profile.dart';
 import '../models/user_profile.dart';
 import '../models/message.dart';
@@ -924,8 +925,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     }
   }
 
-  void _makePhoneCall(String phoneNumber) {
-    showDialog(
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    // Remove any spaces, dashes, or special characters from phone number
+    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Call Provider'),
@@ -959,19 +963,11 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Calling $phoneNumber...'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
+            onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
@@ -981,6 +977,34 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         ],
       ),
     );
+
+    if (confirmed == true) {
+      try {
+        final uri = Uri(scheme: 'tel', path: cleanNumber);
+
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Cannot make phone calls on this device'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error making call: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   Widget _buildActionButtons() {

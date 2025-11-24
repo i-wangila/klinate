@@ -8,6 +8,7 @@ import 'withdraw_screen.dart';
 import 'manage_cards_screen.dart';
 import 'manage_accounts_screen.dart';
 import 'transaction_history_screen.dart';
+import 'pay_bills_screen.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -589,20 +590,9 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   void _showPayBillsInfo() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Pay Bills'),
-        content: const Text(
-          'Pay bills feature is coming soon. For now, you can pay healthcare providers directly through their profiles.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PayBillsScreen()),
     );
   }
 

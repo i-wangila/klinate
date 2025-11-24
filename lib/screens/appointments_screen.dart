@@ -12,7 +12,6 @@ import '../models/message.dart';
 import '../utils/responsive_utils.dart';
 import 'reschedule_appointment_screen.dart';
 import 'rate_provider_screen.dart';
-import 'call_screen.dart';
 import 'book_appointment_screen.dart';
 
 class AppointmentsScreen extends StatefulWidget {
@@ -52,13 +51,65 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           children: [
             Padding(
               padding: ResponsiveUtils.getResponsivePadding(context),
-              child: Text(
-                'My Bookings',
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.getResponsiveFontSize(context, 20),
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'My Bookings',
+                    style: TextStyle(
+                      fontSize: ResponsiveUtils.getResponsiveFontSize(
+                        context,
+                        20,
+                      ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    onSelected: (value) {
+                      if (value == 'clear_completed') {
+                        _showClearHistoryDialog('completed');
+                      } else if (value == 'clear_cancelled') {
+                        _showClearHistoryDialog('cancelled');
+                      } else if (value == 'clear_all_history') {
+                        _showClearHistoryDialog('all_history');
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'clear_completed',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_sweep, size: 20),
+                            SizedBox(width: 8),
+                            Text('Clear Completed'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'clear_cancelled',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_sweep, size: 20),
+                            SizedBox(width: 8),
+                            Text('Clear Cancelled'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'clear_all_history',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_forever, size: 20),
+                            SizedBox(width: 8),
+                            Text('Clear All History'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -677,68 +728,56 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   }
 
   void _startVideoCall(Appointment appointment) async {
-    // Get current user information
-    final currentUser = UserService.currentUser;
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to start call. Please log in again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+    try {
+      final currentUser = UserService.currentUser;
+      if (currentUser == null) {
+        throw Exception('User not logged in');
+      }
 
-    // Create a video call session
-    final callSession = await CallService.startCall(
-      providerId: appointment.providerId,
-      providerName: appointment.providerName,
-      callType: CallType.video,
-      patientId: currentUser.email, // Use email as unique identifier
-      patientName: currentUser.name,
-    );
-
-    if (mounted) {
-      // Navigate to call screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CallScreen(callSession: callSession),
-        ),
+      await CallService.initiateCall(
+        context: context,
+        callerId: currentUser.id,
+        callerName: currentUser.name,
+        calleeId: appointment.providerId,
+        calleeName: appointment.providerName,
+        isVideoCall: true,
       );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start video call: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   void _startVoiceCall(Appointment appointment) async {
-    // Get current user information
-    final currentUser = UserService.currentUser;
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to start call. Please log in again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+    try {
+      final currentUser = UserService.currentUser;
+      if (currentUser == null) {
+        throw Exception('User not logged in');
+      }
 
-    // Create a voice call session
-    final callSession = await CallService.startCall(
-      providerId: appointment.providerId,
-      providerName: appointment.providerName,
-      callType: CallType.voice,
-      patientId: currentUser.email, // Use email as unique identifier
-      patientName: currentUser.name,
-    );
-
-    if (mounted) {
-      // Navigate to call screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CallScreen(callSession: callSession),
-        ),
+      await CallService.initiateCall(
+        context: context,
+        callerId: currentUser.id,
+        callerName: currentUser.name,
+        calleeId: appointment.providerId,
+        calleeName: appointment.providerName,
+        isVideoCall: false,
       );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start voice call: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -1192,5 +1231,82 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         ),
       );
     }
+  }
+
+  void _showClearHistoryDialog(String type) {
+    String title;
+    String message;
+    Future<bool> Function() clearFunction;
+
+    switch (type) {
+      case 'completed':
+        title = 'Clear Completed Appointments';
+        message =
+            'Are you sure you want to clear all completed appointments? This action cannot be undone.';
+        clearFunction = AppointmentService.clearCompletedAppointments;
+        break;
+      case 'cancelled':
+        title = 'Clear Cancelled Appointments';
+        message =
+            'Are you sure you want to clear all cancelled appointments? This action cannot be undone.';
+        clearFunction = AppointmentService.clearCancelledAppointments;
+        break;
+      case 'all_history':
+        title = 'Clear All History';
+        message =
+            'Are you sure you want to clear all completed and cancelled appointments? This action cannot be undone.';
+        clearFunction = AppointmentService.clearAllHistory;
+        break;
+      default:
+        return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+
+              navigator.pop();
+              final success = await clearFunction();
+              if (mounted) {
+                if (success) {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('History cleared successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  setState(() {
+                    // Refresh the UI
+                  });
+                } else {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to clear history'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
   }
 }

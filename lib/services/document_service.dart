@@ -628,6 +628,11 @@ class DocumentService {
     }
   }
 
+  // Get documents by provider ID
+  static List<Document> getDocumentsByProviderId(String providerId) {
+    return _documents.where((doc) => doc.providerId == providerId).toList();
+  }
+
   // Check if document type already exists and is approved
   static bool hasApprovedDocument(DocumentType type) {
     return _documents.any(

@@ -422,14 +422,10 @@ class ApprovalService {
   }
 
   // Check if provider has pending documents
-  // TODO: Implement this feature after:
-  // 1. Adding userId/providerId field to Document model
-  // 2. Adding getDocumentsByProviderId method to DocumentService
-  // 3. Linking documents to providers during upload
-  // static bool hasPendingDocuments(String providerId) {
-  //   final documents = DocumentService.getDocumentsByProviderId(providerId);
-  //   return documents.any((doc) => doc.status == DocumentStatus.pending);
-  // }
+  static bool hasPendingDocuments(String providerId) {
+    final documents = DocumentService.getDocumentsByProviderId(providerId);
+    return documents.any((doc) => doc.status == DocumentStatus.pending);
+  }
 
   // Get provider approval statistics
   static Map<String, int> getApprovalStats() {

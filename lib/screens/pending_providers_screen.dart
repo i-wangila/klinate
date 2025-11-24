@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/provider_profile.dart';
 import '../models/user_profile.dart';
 import '../models/document.dart';
@@ -783,14 +784,41 @@ class _PendingProvidersScreenState extends State<PendingProvidersScreen> {
     }
   }
 
-  void _downloadDocument(Document document) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Downloading ${document.name}...'),
-        backgroundColor: Colors.blue,
-      ),
-    );
-    // TODO: Implement actual download functionality
+  Future<void> _downloadDocument(Document document) async {
+    try {
+      final uri = Uri.parse(document.filePath);
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Opening ${document.name}...'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Cannot open ${document.name}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error opening document: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   IconData _getProviderIcon(UserRole type) {
